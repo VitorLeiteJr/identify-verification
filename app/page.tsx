@@ -1,15 +1,15 @@
 "use client"
 import React, { useEffect, useRef, useState } from 'react';
 import * as faceapi from 'face-api.js';
+import { QRCodeCanvas } from 'qrcode.react';
+import { getURL } from 'next/dist/shared/lib/utils';
 
 const FaceValidation: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  const faceCapturedRef = useRef(false); // Evita múltiplos envios
-
-  const [text,setText] = useState<string>("Posicione seu rosto dentro da marcação");
-
+  const faceCapturedRef = useRef(false);
+  const [cameraError, setCameraError] = useState(false);
 
   useEffect(() => {
     const loadModels = async () => {
@@ -18,42 +18,30 @@ const FaceValidation: React.FC = () => {
       startVideo();
     };
 
-    // const startVideo = () => {
-    //   navigator.mediaDevices.getUserMedia({ video: true }).then((stream) => {
-    //     if (videoRef.current) {
-    //       videoRef.current.srcObject = stream;
-    //     }
-
-    //     // Começa a detecção automática após iniciar vídeo
-    //     intervalRef.current = setInterval(detectFace, 1000);
-    //   });
-    // };
     const startVideo = () => {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        setCameraError(true);
+        return;
+      }
+
       const constraints = {
-        video: {
-          facingMode: 'user', // "user" = câmera frontal | "environment" = traseira
-          width: { ideal: 640 },
-          height: { ideal: 480 },
-        },
+        video: { facingMode: 'user' },
         audio: false,
       };
-    
+
       navigator.mediaDevices
         .getUserMedia(constraints)
         .then((stream) => {
           if (videoRef.current) {
             videoRef.current.srcObject = stream;
           }
-    
-          // Iniciar detecção após vídeo carregar
           intervalRef.current = setInterval(detectFace, 1000);
         })
         .catch((err) => {
-          console.error('Erro ao acessar câmera:', err);
-          alert('Não foi possível acessar a câmera. Verifique permissões.');
+          console.error('Erro ao acessar a câmera:', err);
+          setCameraError(true);
         });
     };
-    
 
     loadModels();
 
@@ -71,8 +59,7 @@ const FaceValidation: React.FC = () => {
     );
 
     if (detection) {
-      setText("Rosto detectado");
-      faceCapturedRef.current = true; // evita múltiplas capturas
+      faceCapturedRef.current = true;
       captureAndSendImage();
     }
   };
@@ -85,9 +72,7 @@ const FaceValidation: React.FC = () => {
     ctx?.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
 
     const imageData = canvas.toDataURL('image/jpeg');
-    setText("Enviando, aguarde...");
 
-    // 🔥 Aqui vai a chamada para sua API
     fetch('https://sua-api.com/validar-rosto', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -104,12 +89,22 @@ const FaceValidation: React.FC = () => {
       });
   };
 
+  if (cameraError) {
+    return (
+      <div style={styles.container}>
+        <p style={styles.instruction}>Não conseguimos acessar sua câmera.</p>
+        <p style={{ marginBottom: 12 }}>Escaneie o QR Code com seu celular para validar seu rosto:</p>
+        <QRCodeCanvas value={window.location.href} size={200} />
+      </div>
+    );
+  }
+
   return (
     <div style={styles.container}>
       <video ref={videoRef} autoPlay muted playsInline style={styles.video} />
       <div style={styles.ovalBorder} />
       <canvas ref={canvasRef} width={320} height={400} style={{ display: 'none' }} />
-      <p style={styles.instruction}>{text}</p>
+      <p style={styles.instruction}>Posicione seu rosto dentro da marcação</p>
     </div>
   );
 };
@@ -120,9 +115,10 @@ const styles: { [key: string]: React.CSSProperties } = {
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    position: 'relative',
     height: '100vh',
+    textAlign: 'center',
     backgroundColor: '#fff',
+    padding: 20,
   },
   video: {
     width: 320,
@@ -144,7 +140,6 @@ const styles: { [key: string]: React.CSSProperties } = {
     marginTop: 20,
     color: '#333',
     fontSize: 16,
-    textAlign: 'center',
   },
 };
 
