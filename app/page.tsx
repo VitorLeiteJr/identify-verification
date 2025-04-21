@@ -1,7 +1,7 @@
 "use client"
 import React, { useEffect, useRef, useState } from 'react';
 import * as faceapi from 'face-api.js';
-import { QRCodeCanvas } from 'qrcode.react';
+import  { QRCodeCanvas } from 'qrcode.react';
 
 const FaceValidation: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -9,7 +9,8 @@ const FaceValidation: React.FC = () => {
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const faceCapturedRef = useRef(false);
   const [cameraError, setCameraError] = useState(false);
-
+  const [faceTooSmall, setFaceTooSmall] = useState(false);
+ 
   useEffect(() => {
     const loadModels = async () => {
       const MODEL_URL = '/models';
@@ -43,7 +44,6 @@ const FaceValidation: React.FC = () => {
     };
 
     loadModels();
-
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
@@ -51,13 +51,22 @@ const FaceValidation: React.FC = () => {
 
   const detectFace = async () => {
     if (!videoRef.current || faceCapturedRef.current) return;
-
+  
     const detection = await faceapi.detectSingleFace(
       videoRef.current,
       new faceapi.TinyFaceDetectorOptions()
     );
-
+  
     if (detection) {
+      const { width, height } = detection.box;
+  
+      // Defina os limites mínimos para considerar o rosto "próximo"
+      if (width < 300 || height < 300) {
+        setFaceTooSmall(true);
+        return; // Não captura ainda
+      }
+  
+      setFaceTooSmall(false);
       faceCapturedRef.current = true;
       captureAndSendImage();
     }
@@ -72,74 +81,64 @@ const FaceValidation: React.FC = () => {
 
     const imageData = canvas.toDataURL('image/jpeg');
 
-    fetch('https://sua-api.com/validar-rosto', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ image: imageData }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log('Resposta da API:', data);
-        alert('Rosto enviado com sucesso!');
-      })
-      .catch((err) => {
-        console.error('Erro ao enviar imagem:', err);
-        alert('Erro ao enviar imagem.');
-      });
-  };
+    console.log(imageData);
+    alert('fetch para o datavalid');
+
+  //   fetch('https://sua-api.com/validar-rosto', {
+  //     method: 'POST',
+  //     headers: { 'Content-Type': 'application/json' },
+  //     body: JSON.stringify({ image: imageData }),
+  //   })
+  //     .then((res) => res.json())
+  //     .then((data) => {
+  //       console.log('Resposta da API:', data);
+  //       alert('Rosto enviado com sucesso!');
+  //     })
+  //     .catch((err) => {
+  //       console.error('Erro ao enviar imagem:', err);
+  //       alert('fazer o fetch para o datavalid');
+  //     });
+   };
 
   if (cameraError) {
     return (
-      <div style={styles.container}>
-        <p style={styles.instruction}>Não conseguimos acessar sua câmera.</p>
-        <p style={{ marginBottom: 12 }}>Escaneie o QR Code com seu celular para validar seu rosto:</p>
+      <div className="flex flex-col items-center justify-center h-screen text-center bg-black px-4">
+        <p className="text-lg font-medium mb-2">Não conseguimos acessar sua câmera.</p>
+        <p className="mb-4">Escaneie o QR Code com seu celular para validar seu rosto:</p>
         <QRCodeCanvas value={window.location.href} size={200} />
       </div>
     );
   }
 
   return (
-    <div style={styles.container}>
-      <video ref={videoRef} autoPlay muted playsInline style={styles.video} />
-      <div style={styles.ovalBorder} />
-      <canvas ref={canvasRef} width={320} height={400} style={{ display: 'none' }} />
-      <p style={styles.instruction}>Posicione seu rosto dentro da marcação</p>
+    <div>
+    <div className="flex items-center justify-center h-screen bg-white mb-2">
+       <div className="absolute w-80 h-[400px] border-4 border-purple-700 rounded-full z-20" >
+      <video
+        ref={videoRef}
+        autoPlay
+        muted
+        playsInline
+        className="w-80 h-[400px] object-cover rounded-full relative z-10"
+      />
+    
+      <canvas ref={canvasRef} width={320} height={400} className="hidden" />
+            <p className=" absolute mt-6 text-black text-center text-base z-30">
+              Posicione seu rosto dentro da marcação
+            </p>
+              {faceTooSmall && (
+          <p className="mt-2 text-red-600 font-medium animate-bounce z-30">
+            Aproxime seu rosto da câmera
+          </p>
+            )}
+      </div>
+      
+     
+    </div>
+   
+     
     </div>
   );
-};
-
-const styles: { [key: string]: React.CSSProperties } = {
-  container: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: '100vh',
-    textAlign: 'center',
-    backgroundColor: '#fff',
-    padding: 20,
-  },
-  video: {
-    width: 320,
-    height: 400,
-    objectFit: 'cover',
-    borderRadius: '9999px',
-    position: 'relative',
-    zIndex: 1,
-  },
-  ovalBorder: {
-    position: 'absolute',
-    width: 320,
-    height: 400,
-    borderRadius: '9999px',
-    border: '4px solid #8000C8',
-    zIndex: 2,
-  },
-  instruction: {
-    marginTop: 20,
-    color: '#333',
-    fontSize: 16,
-  },
 };
 
 export default FaceValidation;
