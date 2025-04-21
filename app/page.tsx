@@ -2,7 +2,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as faceapi from 'face-api.js';
 import { QRCodeCanvas } from 'qrcode.react';
-import { getURL } from 'next/dist/shared/lib/utils';
 
 const FaceValidation: React.FC = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
