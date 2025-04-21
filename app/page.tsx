@@ -128,7 +128,7 @@ const FaceValidation: React.FC = () => {
       />
     
       <canvas ref={canvasRef} width={320} height={400} className="hidden" />
-            {!faceTooSmall &&(<p className=" absolute mt-6 text-white text-center text-base z-30">
+            {!faceTooSmall &&(<p className=" absolute mt-6 text-black text-center text-base z-30">
                {textStatus}
             </p>)}
               {faceTooSmall && (
