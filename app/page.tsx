@@ -10,6 +10,8 @@ const FaceValidation: React.FC = () => {
   const faceCapturedRef = useRef(false);
   const [cameraError, setCameraError] = useState(false);
   const [faceTooSmall, setFaceTooSmall] = useState(false);
+
+  const [textStatus, setTextStatus] = useState<string>('Posicione seu rosto dentro da marcação');
  
   useEffect(() => {
     const loadModels = async () => {
@@ -63,6 +65,7 @@ const FaceValidation: React.FC = () => {
       // Defina os limites mínimos para considerar o rosto "próximo"
       if (width < 300 || height < 300) {
         setFaceTooSmall(true);
+        setTextStatus("Aproxime seu rosto da camera")
         return; // Não captura ainda
       }
   
@@ -82,7 +85,9 @@ const FaceValidation: React.FC = () => {
     const imageData = canvas.toDataURL('image/jpeg');
 
     console.log(imageData);
-    alert('fetch para o datavalid');
+    setTextStatus('fetch para o datavalid');
+
+    return;
 
   //   fetch('https://sua-api.com/validar-rosto', {
   //     method: 'POST',
@@ -123,12 +128,12 @@ const FaceValidation: React.FC = () => {
       />
     
       <canvas ref={canvasRef} width={320} height={400} className="hidden" />
-            <p className=" absolute mt-6 text-black text-center text-base z-30">
-              Posicione seu rosto dentro da marcação
-            </p>
+            {!faceTooSmall &&(<p className=" absolute mt-6 text-black text-center text-base z-30">
+               {textStatus}
+            </p>)}
               {faceTooSmall && (
           <p className="mt-2 text-red-600 font-medium animate-bounce z-30">
-            Aproxime seu rosto da câmera
+                  {textStatus}
           </p>
             )}
       </div>
