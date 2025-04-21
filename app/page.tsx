@@ -1,5 +1,5 @@
 "use client"
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import * as faceapi from 'face-api.js';
 
 const FaceValidation: React.FC = () => {
@@ -7,6 +7,9 @@ const FaceValidation: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const faceCapturedRef = useRef(false); // Evita múltiplos envios
+
+  const [text,setText] = useState<string>("Posicione seu rosto dentro da marcação");
+
 
   useEffect(() => {
     const loadModels = async () => {
@@ -68,6 +71,7 @@ const FaceValidation: React.FC = () => {
     );
 
     if (detection) {
+      setText("Rosto detectado");
       faceCapturedRef.current = true; // evita múltiplas capturas
       captureAndSendImage();
     }
@@ -81,6 +85,7 @@ const FaceValidation: React.FC = () => {
     ctx?.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
 
     const imageData = canvas.toDataURL('image/jpeg');
+    setText("Enviando, aguarde...");
 
     // 🔥 Aqui vai a chamada para sua API
     fetch('https://sua-api.com/validar-rosto', {
@@ -104,7 +109,7 @@ const FaceValidation: React.FC = () => {
       <video ref={videoRef} autoPlay muted playsInline style={styles.video} />
       <div style={styles.ovalBorder} />
       <canvas ref={canvasRef} width={320} height={400} style={{ display: 'none' }} />
-      <p style={styles.instruction}>Posicione seu rosto dentro da marcação</p>
+      <p style={styles.instruction}>{text}</p>
     </div>
   );
 };
