@@ -2,7 +2,8 @@
 
 "use client"
 import React, { useState, useEffect } from 'react';
-import FaceValidation from './components/faceValidation';
+import { FaceProvider } from './context/FaceContext';
+import FaceCamera from './components/FaceCamera';
 
 
 const MyComponent: React.FC = () => {
@@ -31,7 +32,9 @@ const MyComponent: React.FC = () => {
         <img src="https://builder.spring-builder.prod.yospace.ai/fs/userFiles-v2/segurobet-18751649/images/favicon.png?v=1709064268" 
         alt="client logo" style={{ maxWidth: '200px' }} />
       </div>) : (
-        <FaceValidation/>
+      <div className="flex items-center justify-center h-screen bg-white">
+     <FaceProvider><FaceCamera /></FaceProvider> 
+     </div>
       )}
       </>
   );
@@ -39,3 +42,40 @@ const MyComponent: React.FC = () => {
 
   };
 export default MyComponent;
+
+// "use client";
+// import React, { useState } from "react";
+// import { FaceProvider } from "./context/FaceContext";
+// import FaceCamera from "./components/FaceCamera";
+// import DocCamera from "./components/DocCamera";
+// import { DocsProvider } from "./context/DocsContext";
+
+
+// const Home: React.FC = () => {
+//  // const { cameraError, dataValidValidation } = useFaceContext();
+
+//  const [test, setTest] = useState<boolean>(false);
+
+ 
+ 
+   
+
+//  if(test) return ( <>
+//    <div className="flex items-center justify-center h-screen bg-white">
+//  {<DocsProvider><DocCamera /></DocsProvider> }
+//  </div>
+//  </>);
+
+//   return (
+//     <>
+//       <button className="absolute bg-black" onClick={()=>setTest(true)}>test</button>
+//     <div className="flex items-center justify-center h-screen bg-white">
+//       <FaceProvider><FaceCamera /></FaceProvider> 
+//     </div>
+
+//     </>
+//   );
+
+// };
+
+// export default Home;
