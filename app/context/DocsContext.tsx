@@ -119,7 +119,7 @@ export const DocsProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, []);
+  }, [facingMode]);
 
   const toggleFacingMode = () => {
     // Desliga o stream atual
