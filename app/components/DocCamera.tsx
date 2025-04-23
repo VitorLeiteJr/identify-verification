@@ -9,10 +9,9 @@ const DocCamera: React.FC = () => {
 
   return (
   <>
-    <div className="absolute w-80 h-[400px] border-4 border-green-700 z-20">
-    <button className="text-black" onClick={()=>toggleFacingMode()} >change camera</button>
-
+    <div className="absolute w-80 h-[400px] border-4 border-green-700 z-20">   
     
+  <button className="text-black absolute top-0 right-0 z-30" onClick={()=>toggleFacingMode()} >change camera</button> 
       <video
         ref={videoDocRef}
         autoPlay
