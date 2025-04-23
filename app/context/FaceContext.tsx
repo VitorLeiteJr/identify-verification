@@ -1,6 +1,7 @@
 "use client";
 import React, { createContext, useContext, useEffect, useRef, useState } from "react";
 import * as faceapi from "face-api.js";
+import { useGlobalContext } from "./GlobalContext";
 
 type FaceContextType = {
   videoRef: React.RefObject<HTMLVideoElement | null > ;
@@ -8,7 +9,6 @@ type FaceContextType = {
   textStatus: string;
   faceTooSmall: boolean;
   cameraError: boolean;
-  dataValidValidation: boolean;
 };
 
 const FaceContext = createContext<FaceContextType | undefined>(undefined);
@@ -29,7 +29,7 @@ export const FaceProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [faceTooSmall, setFaceTooSmall] = useState<boolean>(false);
   const [cameraError, setCameraError] = useState<boolean>(false);
 
-  const [dataValidValidation, setDataValidValidation] = useState<boolean>(false);
+  const {setDataValidValidation, setLoading,setStatusValidation} = useGlobalContext();
 
 
 
@@ -93,8 +93,15 @@ export const FaceProvider: React.FC<{ children: React.ReactNode }> = ({ children
      // const imageData = canvasRef.current.toDataURL("image/jpeg");
 
    //  console.log("Imagem capturada:", imageData);
-      setTextStatus("Imagem capturada e enviada para API (simulado)");
-      setDataValidValidation(true);
+
+
+      //  FAZER O FETCH PARA O DATAVALID
+
+      setTextStatus("Imagem capturada e enviada para data Valid esperar retorno para validacao");
+      setDataValidValidation(true); // supose that be true
+      setLoading(true);//true to show loading
+      setStatusValidation("Validando image...");
+
       videoRef.current=null;
       canvasRef.current=null;
       return;
@@ -109,7 +116,7 @@ export const FaceProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   return (
     <FaceContext.Provider
-      value={{ videoRef, canvasRef, textStatus, faceTooSmall, cameraError, dataValidValidation }}
+      value={{ videoRef, canvasRef, textStatus, faceTooSmall, cameraError }}
     >
       {children}
     </FaceContext.Provider>

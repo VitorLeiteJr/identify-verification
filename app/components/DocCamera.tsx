@@ -8,13 +8,13 @@ const DocCamera: React.FC = () => {
   const { videoDocRef, canvasRef, textStatus, faceTooSmall } = useDocsContext();
 
   return (
-    <div className="absolute w-80 h-[400px] border-4 border-green-700 rounded-full z-20">
+    <div className="absolute w-80 h-[400px] border-4 border-green-700 z-20">
       <video
         ref={videoDocRef}
         autoPlay
         muted
         playsInline
-        className="w-80 h-[400px] object-cover rounded-full relative z-10"
+        className=" w-80 h-[394px] object-cover relative z-20"
       />
       <canvas ref={canvasRef} width={320} height={400} className="hidden" />
       <p
