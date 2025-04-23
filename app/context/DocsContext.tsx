@@ -9,8 +9,6 @@ type DocsContextType = {
   faceTooSmall: boolean;
   cameraError: boolean;
   dataValidValidation: boolean;
-  camera: string;
-  setCamera: (camera: string) => void;
   toggleFacingMode: () => void;
 };
 
@@ -34,10 +32,7 @@ export const DocsProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const [dataValidValidation, setDataValidValidation] = useState<boolean>(false);
 
-  const [camera, setCamera] = useState<string>("user");
-
-
-
+  const [facingMode, setFacingMode] = useState<"user" | "environment">("user");
 
 
   useEffect(() => {
@@ -54,13 +49,15 @@ export const DocsProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       navigator.mediaDevices
-        .getUserMedia({ video: { facingMode: camera }, audio: false })
+        .getUserMedia({ video: { facingMode }, audio: false })
         .then((stream) => {
           if (videoDocRef.current) videoDocRef.current.srcObject = stream;
           intervalRef.current = setInterval(detectFace, 1000);
         })
         .catch(() => setCameraError(true));
     };
+
+    
 
     const detectFace = async () => {
       if (!videoDocRef.current || faceCapturedRef.current) return;
@@ -118,13 +115,16 @@ export const DocsProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Desliga o stream atual
     const stream = videoDocRef.current?.srcObject as MediaStream;
     stream?.getTracks().forEach(track => track.stop());
-  
-    setCamera((prev) => (prev === "user" ? "environment" : "user"));
+
+    setFacingMode((prev) => (prev === "user" ? "environment" : "user"));
+    console.log(facingMode);
   };
+
+  
 
   return (
     <DocsContext.Provider
-      value={{ videoDocRef, canvasRef, textStatus, faceTooSmall, cameraError, dataValidValidation,camera, setCamera, toggleFacingMode }}
+      value={{ videoDocRef, canvasRef, textStatus, faceTooSmall, cameraError, dataValidValidation, toggleFacingMode }}
     >
       {children}
     </DocsContext.Provider>
