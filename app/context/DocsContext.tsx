@@ -9,6 +9,8 @@ type DocsContextType = {
   faceTooSmall: boolean;
   cameraError: boolean;
   dataValidValidation: boolean;
+  camera: string;
+  setCamera: (camera: string) => void;
 };
 
 const DocsContext = createContext<DocsContextType | undefined>(undefined);
@@ -31,6 +33,10 @@ export const DocsProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const [dataValidValidation, setDataValidValidation] = useState<boolean>(false);
 
+  const [camera, setCamera] = useState<string>("user");
+
+
+
 
 
   useEffect(() => {
@@ -47,7 +53,7 @@ export const DocsProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
 
       navigator.mediaDevices
-        .getUserMedia({ video: { facingMode: "user" }, audio: false })
+        .getUserMedia({ video: { facingMode: camera }, audio: false })
         .then((stream) => {
           if (videoDocRef.current) videoDocRef.current.srcObject = stream;
           intervalRef.current = setInterval(detectFace, 1000);
@@ -109,7 +115,7 @@ export const DocsProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   return (
     <DocsContext.Provider
-      value={{ videoDocRef, canvasRef, textStatus, faceTooSmall, cameraError, dataValidValidation }}
+      value={{ videoDocRef, canvasRef, textStatus, faceTooSmall, cameraError, dataValidValidation,camera, setCamera }}
     >
       {children}
     </DocsContext.Provider>
