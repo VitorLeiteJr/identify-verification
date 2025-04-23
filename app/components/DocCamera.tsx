@@ -5,12 +5,12 @@ import { useDocsContext } from "../context/DocsContext";
 const DocCamera: React.FC = () => {
 
 
-  const { videoDocRef, canvasRef, textStatus, faceTooSmall, setCamera } = useDocsContext();
+  const { videoDocRef, canvasRef, textStatus, faceTooSmall, setCamera, toggleFacingMode } = useDocsContext();
 
   return (
   <>
     <div className="absolute w-80 h-[400px] border-4 border-green-700 z-20">
-    <button className="text-black" onClick={()=>setCamera("environment")} >change camera</button>
+    <button className="text-black" onClick={()=>toggleFacingMode()} >change camera</button>
 
     
       <video

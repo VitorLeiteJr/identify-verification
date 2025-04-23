@@ -11,6 +11,7 @@ type DocsContextType = {
   dataValidValidation: boolean;
   camera: string;
   setCamera: (camera: string) => void;
+  toggleFacingMode: () => void;
 };
 
 const DocsContext = createContext<DocsContextType | undefined>(undefined);
@@ -113,9 +114,17 @@ export const DocsProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, []);
 
+  const toggleFacingMode = () => {
+    // Desliga o stream atual
+    const stream = videoDocRef.current?.srcObject as MediaStream;
+    stream?.getTracks().forEach(track => track.stop());
+  
+    setCamera((prev) => (prev === "user" ? "environment" : "user"));
+  };
+
   return (
     <DocsContext.Provider
-      value={{ videoDocRef, canvasRef, textStatus, faceTooSmall, cameraError, dataValidValidation,camera, setCamera }}
+      value={{ videoDocRef, canvasRef, textStatus, faceTooSmall, cameraError, dataValidValidation,camera, setCamera, toggleFacingMode }}
     >
       {children}
     </DocsContext.Provider>
