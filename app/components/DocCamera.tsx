@@ -5,7 +5,7 @@ import { useDocsContext } from "../context/DocsContext";
 const DocCamera: React.FC = () => {
 
 
-  const { videoDocRef, canvasRef, textStatus, faceTooSmall, setCamera, toggleFacingMode } = useDocsContext();
+  const { videoDocRef, canvasRef, textStatus, faceTooSmall, toggleFacingMode } = useDocsContext();
 
   return (
   <>
