@@ -48,13 +48,23 @@ export const DocsProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return;
       }
 
-      navigator.mediaDevices
-        .getUserMedia({ video: { facingMode }, audio: false })
-        .then((stream) => {
-          if (videoDocRef.current) videoDocRef.current.srcObject = stream;
-          intervalRef.current = setInterval(detectFace, 1000);
-        })
-        .catch(() => setCameraError(true));
+      // navigator.mediaDevices
+      //   .getUserMedia({ video: { facingMode }, audio: false })
+      //   .then((stream) => {
+      //     if (videoDocRef.current) videoDocRef.current.srcObject = stream;
+      //     intervalRef.current = setInterval(detectFace, 1000);
+      //   })
+      //   .catch(() => setCameraError(true));
+
+        navigator.mediaDevices
+    .getUserMedia({ video: { facingMode }, audio: false })
+    .then((stream) => {
+      if (videoDocRef.current) {
+        videoDocRef.current.srcObject = stream;
+        intervalRef.current = setInterval(detectFace, 1000);
+      }
+    })
+    .catch(() => setCameraError(true));
     };
 
     
