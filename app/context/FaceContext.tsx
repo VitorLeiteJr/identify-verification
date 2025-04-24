@@ -47,6 +47,8 @@ export const FaceProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return;
       }
 
+      console.log("start camera face context")
+
       navigator.mediaDevices
         .getUserMedia({ video: { facingMode: "user" }, audio: false })
         .then((stream) => {

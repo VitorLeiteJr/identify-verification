@@ -57,8 +57,8 @@ const MyComponent: React.FC = () => {
 
   if(!dataValidValidation) return (
     <>
-    <DocChoice/>
-      {/* {loading ? (
+    
+       {loading ? (
          <div className='flex  bg-white justify-center items-center h-[100vh]'>
          <div  className=''>
                  <img src="https://builder.spring-builder.prod.yospace.ai/fs/userFiles-v2/segurobet-18751649/images/favicon.png?v=1709064268" 
@@ -73,11 +73,10 @@ const MyComponent: React.FC = () => {
       <div className="flex items-center justify-center h-screen bg-green-200">
 
 
-    <DocsProvider>
-      <DocCamera />
-    </DocsProvider>
+  
+    <DocChoice/>
     </div>
-      )} */}
+      )}
       </>
   )
 
