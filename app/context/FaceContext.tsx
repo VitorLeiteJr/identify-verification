@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from "react";
 import * as faceapi from "face-api.js";
 import { useGlobalContext } from "./GlobalContext";
+import base64Size from "../utils/checkImageSize";
 
 type FaceContextType = {
   videoRef: React.RefObject<HTMLVideoElement | null > ;
@@ -64,19 +65,16 @@ export const FaceProvider: React.FC<{ children: React.ReactNode }> = ({ children
       );
 
       if (detection) {
-        // const { width, height } = detection.box;
+        
+              const { width, height } = detection.box;
+                  if (width < 250 || height < 250) {
+                    setTextStatus("Aproxime mais o rosto da câmera");
+                    setFaceTooSmall(true);
+                    return;
+                }
 
-        // if (width < 300 || height < 300) {
-        //   setFaceTooSmall(true);
-        //   setTextStatus("Aproxime seu rosto da câmera");
-        //   return;
-        // }
+               
 
-        // if (width > 320 || height > 320) {
-        //   setFaceTooSmall(true);
-        //   setTextStatus("Afaste seu rosto da câmera");
-        //   return;
-        // }
 
         setFaceTooSmall(false);
         faceCapturedRef.current = true;
@@ -85,28 +83,58 @@ export const FaceProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     const captureAndSendImage = () => {
-
       if (!canvasRef.current || !videoRef.current) return;
+    
+      const canvas = canvasRef.current;
+      const video = videoRef.current;
+    
+      // Ajusta o canvas para 750x750
+      canvas.width = 750;
+      canvas.height = 750;
+    
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+    
+      // Proporção original da câmera
+      const videoWidth = video.videoWidth;
+      const videoHeight = video.videoHeight;
+      const aspectRatio = videoWidth / videoHeight;
+    
+      let sx = 0, sy = 0, sWidth = videoWidth, sHeight = videoHeight;
+    
+      // Corta o centro do vídeo mantendo proporção
+      if (aspectRatio > 1) {
+        // Mais largo que alto: corta nas laterais
+        sWidth = videoHeight;
+        sx = (videoWidth - sWidth) / 2;
+      } else {
+        // Mais alto que largo: corta no topo/baixo
+        sHeight = videoWidth;
+        sy = (videoHeight - sHeight) / 2;
+      }
+    
+      ctx.drawImage(video, sx, sy, sWidth, sHeight, 0, 0, 750, 750);
+    
+      const imageData = canvas.toDataURL("image/png", 0.95); // qualidade boa, compressão
 
-      const ctx = canvasRef.current.getContext("2d");
-      ctx?.drawImage(videoRef.current, 0, 0, canvasRef.current.width, canvasRef.current.height);
-     // const imageData = canvasRef.current.toDataURL("image/jpeg");
-
-   //  console.log("Imagem capturada:", imageData);
-
-
-      //  FAZER O FETCH PARA O DATAVALID
-
-      setTextStatus("Imagem capturada e enviada para data Valid esperar retorno para validacao");
-      setDataValidValidation(true); // supose that be true
-      setLoading(true);//true to show loading
-      setStatusValidation("Validando image...");
-
-      videoRef.current=null;
-      canvasRef.current=null;
-      return;
-
+      if (base64Size(imageData) > 3) {
+        setTextStatus("Imagem muito pesada. Ajuste iluminação ou distância.");
+        return;
+      }
+    
+      console.log(imageData);
+    
+      // AQUI IRIA O FETCH PARA O DATAVALID
+      setTextStatus("Imagem capturada e enviada para validação.");
+      setDataValidValidation(true);
+      setLoading(true);
+      setStatusValidation("Validando imagem...");
+    
+      // Limpa referências
+      videoRef.current = null;
+      canvasRef.current = null;
     };
+
 
     loadModels();
     return () => {
