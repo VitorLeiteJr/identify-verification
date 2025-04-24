@@ -6,10 +6,10 @@ type DocsContextType = {
   videoDocRef: React.RefObject<HTMLVideoElement | null > ;
   canvasRef: React.RefObject<HTMLCanvasElement | null> ;
   textStatus: string;
-  faceTooSmall: boolean;
   cameraError: boolean;
   dataValidValidation: boolean;
   toggleFacingMode: () => void;
+  captureAndSendImage: () => void;
 };
 
 const DocsContext = createContext<DocsContextType | undefined>(undefined);
@@ -23,11 +23,9 @@ export const useDocsContext = () => {
 export const DocsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const videoDocRef = useRef<HTMLVideoElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  const faceCapturedRef = useRef(false);
+  //const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   const [textStatus, setTextStatus] = useState<string>("Posicione seu rosto dentro da marcação");
-  const [faceTooSmall, setFaceTooSmall] = useState<boolean>(false);
   const [cameraError, setCameraError] = useState<boolean>(false);
 
   const [dataValidValidation, setDataValidValidation] = useState<boolean>(false);
@@ -61,65 +59,63 @@ export const DocsProvider: React.FC<{ children: React.ReactNode }> = ({ children
     .then((stream) => {
       if (videoDocRef.current) {
         videoDocRef.current.srcObject = stream;
-        intervalRef.current = setInterval(detectFace, 1000);
+        //intervalRef.current = setInterval(detectFace, 1000);
       }
     })
     .catch(() => setCameraError(true));
     };
 
-    
-
-    const detectFace = async () => {
-      if (!videoDocRef.current || faceCapturedRef.current) return;
-
-      const detection = await faceapi.detectSingleFace(
-        videoDocRef.current,
-        new faceapi.TinyFaceDetectorOptions()
-      );
-
-      if (detection) {
-        // const { width, height } = detection.box;
-
-        // if (width < 300 || height < 300) {
-        //   setFaceTooSmall(true);
-        //   setTextStatus("Aproxime seu rosto da câmera");
-        //   return;
-        // }
-
-        // if (width > 320 || height > 320) {
-        //   setFaceTooSmall(true);
-        //   setTextStatus("Afaste seu rosto da câmera");
-        //   return;
-        // }
-
-        setFaceTooSmall(false);
-        faceCapturedRef.current = true;
-        captureAndSendImage();
-      }
-    };
-
-    const captureAndSendImage = () => {
-
-      if (!canvasRef.current || !videoDocRef.current) return;
-
-      const ctx = canvasRef.current.getContext("2d");
-      ctx?.drawImage(videoDocRef.current, 0, 0, canvasRef.current.width, canvasRef.current.height);
-     // const imageData = canvasRef.current.toDataURL("image/jpeg");
-
-   //  console.log("Imagem capturada:", imageData);
-      setTextStatus("Imagem capturada e enviada para API (simulado)");
-      setDataValidValidation(true);
-      videoDocRef.current=null;
-      canvasRef.current=null;
-      return;
-
-    };
 
     loadModels();
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
+    // return () => {
+    //   if (intervalRef.current) clearInterval(intervalRef.current);
+    // };
   }, [facingMode]);
+
+  const captureAndSendImage = () => {
+
+    if (!canvasRef.current || !videoDocRef.current) return;
+
+    const canvas = canvasRef.current;
+    const video = videoDocRef.current;
+  
+
+    canvas.width = 1024;
+      canvas.height = 768;
+    
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+    
+      // Proporção original da câmera
+      const videoWidth = video.videoWidth;
+      const videoHeight = video.videoHeight;
+      const aspectRatio = videoWidth / videoHeight;
+    
+      let sx = 0, sy = 0, sWidth = videoWidth, sHeight = videoHeight;
+    
+      // Corta o centro do vídeo mantendo proporção
+      if (aspectRatio > 1) {
+        // Mais largo que alto: corta nas laterais
+        sWidth = videoHeight;
+        sx = (videoWidth - sWidth) / 2;
+      } else {
+        // Mais alto que largo: corta no topo/baixo
+        sHeight = videoWidth;
+        sy = (videoHeight - sHeight) / 2;
+      }
+    
+      ctx.drawImage(video, sx, sy, sWidth, sHeight, 0, 0, 1024, 768);
+    
+      const imageData = canvas.toDataURL();
+
+      console.log(imageData);
+    setTextStatus("Imagem capturada e enviada para API (simulado)");
+    setDataValidValidation(true);
+    videoDocRef.current=null;
+    canvasRef.current=null;
+    return;
+
+  };
 
   const toggleFacingMode = () => {
     // Desliga o stream atual
@@ -134,7 +130,7 @@ export const DocsProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   return (
     <DocsContext.Provider
-      value={{ videoDocRef, canvasRef, textStatus, faceTooSmall, cameraError, dataValidValidation, toggleFacingMode }}
+      value={{ videoDocRef, canvasRef, textStatus, cameraError, dataValidValidation, toggleFacingMode,captureAndSendImage }}
     >
       {children}
     </DocsContext.Provider>
