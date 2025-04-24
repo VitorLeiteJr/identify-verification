@@ -5,8 +5,9 @@ import React, {useEffect } from 'react';
 import { FaceProvider } from './context/FaceContext';
 import FaceCamera from './components/FaceCamera';
 import { useGlobalContext } from './context/GlobalContext';
-import { DocsProvider } from './context/DocsContext';
-import DocCamera from './components/DocCamera';
+// import { DocsProvider } from './context/DocsContext';
+// import DocCamera from './components/DocCamera';
+import DocChoice from './components/DocChoice';
 
 
 const MyComponent: React.FC = () => {
@@ -30,7 +31,7 @@ const MyComponent: React.FC = () => {
     fetchData();
   }, [setLoading,loading]);
 
-  if(!dataValidValidation) return (
+  if(dataValidValidation) return (
       <>
       {loading ? (
         <div className='flex  bg-white justify-center items-center h-[100vh]'>
@@ -54,15 +55,16 @@ const MyComponent: React.FC = () => {
       </>
   );
 
-  if(dataValidValidation) return (
+  if(!dataValidValidation) return (
     <>
-      {loading ? (
+    <DocChoice/>
+      {/* {loading ? (
          <div className='flex  bg-white justify-center items-center h-[100vh]'>
          <div  className=''>
                  <img src="https://builder.spring-builder.prod.yospace.ai/fs/userFiles-v2/segurobet-18751649/images/favicon.png?v=1709064268" 
                  alt="client logo" style={{ maxWidth: '200px' }} />
                <div className='flex bottom-0'>
-               <p className='text-blac'>{statusValidation}</p> 
+               <p className='text-black'>{statusValidation}</p> 
                </div>
         </div>
         </div>
@@ -75,7 +77,7 @@ const MyComponent: React.FC = () => {
       <DocCamera />
     </DocsProvider>
     </div>
-      )}
+      )} */}
       </>
   )
 
