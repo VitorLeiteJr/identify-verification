@@ -1,6 +1,7 @@
 "use client"
 import React,{ createContext, useContext, useState } from "react";
 
+
 type globalType = {
     dataValidValidation: boolean;
     setDataValidValidation: (valid: boolean) => void;
@@ -10,6 +11,9 @@ type globalType = {
 
     loading: boolean;
     setLoading: (loading: boolean) => void;
+
+    eventStatus: string;
+    setEventStatus: (status: string) => void;   
 
 };
 
@@ -23,10 +27,11 @@ export const GlobalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     const [dataValidValidation, setDataValidValidation] = useState<boolean>(false);
     const [statusValidation, setStatusValidation] = useState<string>("Iniciando...");
     const [loading, setLoading] = useState<boolean>(true);
+    const [eventStatus,setEventStatus] = useState<string>("START_KYC");
 
     return (
         <globalContext.Provider
-        value={{ dataValidValidation, setDataValidValidation,statusValidation, setStatusValidation, loading, setLoading}}
+        value={{ dataValidValidation, setDataValidValidation,statusValidation, setStatusValidation, loading, setLoading, eventStatus,setEventStatus }}
         >
             {children}
         </globalContext.Provider>

@@ -18,6 +18,11 @@ const UploadIDStep: React.FC = () => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    if (file.size > 3 * 1024 * 1024) {
+      alert("A imagem não pode exceder 3MB.");
+      return;
+    }
+
     const reader = new FileReader();
     reader.onloadend = () => {
       if (typeof reader.result === "string") {
@@ -70,13 +75,14 @@ const UploadIDStep: React.FC = () => {
             <p className="font-bold text-gray-700 mb-1">Frente</p>
             <div className="border rounded-xl relative bg-gray-50 h-32 flex items-center justify-center">
               {frontImage ? (
+                // eslint-disable-next-line @next/next/no-img-element
                 <img src={frontImage} alt="Frente da CNH" className="w-full h-full object-contain" />
               ) : (
                 <FaIdCard className="text-gray-300 w-20 h-20" />
               )}
               <button
                 onClick={() => frontInputRef.current?.click()}
-                className="absolute bottom-2 right-2 bg-green-800 text-white p-2 rounded-full shadow-md"
+                className="absolute bottom-2 right-2 bg-green-800 text-white p-2 rounded-full shadow-md hover:cursor-pointer"
               >
                 <Camera size={20} />
               </button>
@@ -96,13 +102,14 @@ const UploadIDStep: React.FC = () => {
             <p className="font-bold text-gray-700 mb-1">Verso</p>
             <div className="border rounded-xl relative bg-gray-50 h-32 flex items-center justify-center">
               {backImage ? (
+                // eslint-disable-next-line @next/next/no-img-element
                 <img src={backImage} alt="Verso da CNH" className="w-full h-full object-contain" />
               ) : (
                 <BsCardText className="text-gray-300 w-20 h-20" />
               )}
               <button
                 onClick={() => backInputRef.current?.click()}
-                className="absolute bottom-2 right-2 bg-green-800 text-white p-2 rounded-full shadow-md"
+                className="absolute bottom-2 right-2 bg-green-800 text-white p-2 rounded-full shadow-md  hover:cursor-pointer"
               >
                 <Camera size={20} />
               </button>

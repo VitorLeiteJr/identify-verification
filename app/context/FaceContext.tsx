@@ -30,7 +30,7 @@ export const FaceProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [faceTooSmall, setFaceTooSmall] = useState<boolean>(false);
   const [cameraError, setCameraError] = useState<boolean>(false);
 
-  const {setDataValidValidation, setLoading,setStatusValidation} = useGlobalContext();
+  const {setDataValidValidation, setLoading,setStatusValidation, setEventStatus} = useGlobalContext();
 
 
 
@@ -74,6 +74,9 @@ export const FaceProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     setFaceTooSmall(true);
                     return;
                 }
+
+
+
 
                
 
@@ -126,23 +129,45 @@ export const FaceProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
       console.log(imageData);
     
-      // AQUI IRIA O FETCH PARA O DATAVALID
-      setTextStatus("Imagem capturada e enviada para validação.");
-      setDataValidValidation(true);
+      // here the fetch to datavalid
+
+      //setEventStatus("LOADING");
+      setEventStatus("STEP_REQUIRED_FRONT_DOC");
+      setTextStatus("Imagem capturada e enviada para o data valid.");
       setLoading(true);
-      setStatusValidation("Validando imagem...");
-    
+      setStatusValidation("Validando imagem no data valid...");
+      stopCamera();
+      
       // Limpa referências
       videoRef.current = null;
       canvasRef.current = null;
     };
 
+    const stopCamera = () => {
+      console.log("Parando a câmera...");
+    
+     
+        const stream = videoRef.current!.srcObject as MediaStream;
+        stream.getTracks().forEach(track => track.stop());
+        videoRef.current!.srcObject = null;
+      
+    
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    
+      faceCapturedRef.current = false;
+    };
 
     loadModels();
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
-  }, []);
+  }, [setDataValidValidation, setEventStatus, setLoading, setStatusValidation]);
+
+
+  
 
   return (
     <FaceContext.Provider

@@ -6,7 +6,7 @@ const FaceCamera: React.FC = () => {
   const { videoRef, canvasRef, textStatus, faceTooSmall } = useFaceContext();
 
   return (
-    <div className="absolute w-80 h-[400px] border-4 border-purple-700 rounded-full z-20">
+    <div className="absolute w-80 h-[400px] border-4 border-green-800 rounded-full z-20">
       <video
         ref={videoRef}
         autoPlay
