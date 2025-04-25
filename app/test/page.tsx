@@ -84,7 +84,7 @@ const UploadIDStep: React.FC = () => {
                 ref={frontInputRef}
                 type="file"
                 accept="image/*"
-                capture="environment"
+                // capture="environment"
                 className="hidden"
                 onChange={(e) => handleImageChange(e, "front")}
               />
@@ -110,7 +110,7 @@ const UploadIDStep: React.FC = () => {
                 ref={backInputRef}
                 type="file"
                 accept="image/*"
-                capture="environment"
+                // capture="environment"
                 className="hidden"
                 onChange={(e) => handleImageChange(e, "back")}
               />
