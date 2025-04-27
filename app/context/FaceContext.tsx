@@ -87,7 +87,7 @@ export const FaceProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     };
 
-    const captureAndSendImage = () => {
+    const captureAndSendImage = async() => {
       if (!canvasRef.current || !videoRef.current) return;
     
       const canvas = canvasRef.current;
@@ -127,16 +127,46 @@ export const FaceProvider: React.FC<{ children: React.ReactNode }> = ({ children
         return;
       }
     
-      console.log(imageData);
+     //console.log(imageData);
     
       // here the fetch to datavalid
 
-      //setEventStatus("LOADING");
-      setEventStatus("STEP_REQUIRED_FRONT_DOC");
+      const data = await fetch("http://localhost:3001/facevalid", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userid: "123"
+        })
+      });
+                        
+        if(data.status===200){
+
+        const response = await data.json();
+          
+        console.log("face:" +response)
+        
+
+      setEventStatus("SUCCESS");
       setTextStatus("Imagem capturada e enviada para o data valid.");
       setLoading(true);
       setStatusValidation("Validando imagem no data valid...");
       stopCamera();
+   
+      }else{
+
+      
+        setLoading(true);
+        setStatusValidation("Validando sua imagem, aguarde...");
+        stopCamera();
+        setEventStatus("STEP_REQUIRED_DOC");
+
+      }
+
+
+
+      //setEventStatus("LOADING");
       
       // Limpa referências
       videoRef.current = null;
@@ -146,9 +176,11 @@ export const FaceProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const stopCamera = () => {
       console.log("Parando a câmera...");
     
-     
-        const stream = videoRef.current!.srcObject as MediaStream;
-        stream.getTracks().forEach(track => track.stop());
+     //if(videoRef.current?.srcObject===null) return;
+        const stream = videoRef.current?.srcObject as MediaStream;
+      if(stream?.getTracks() ===undefined) return;
+
+        stream?.getTracks()?.forEach(track => track.stop());
         videoRef.current!.srcObject = null;
       
     
