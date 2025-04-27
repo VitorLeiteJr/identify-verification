@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 
 "use client"
-import React, {useEffect, useState } from 'react';
+import React, {useEffect } from 'react';
 import { FaceProvider } from './context/FaceContext';
 import FaceCamera from './components/FaceCamera';
 import { useGlobalContext } from './context/GlobalContext';
@@ -13,10 +13,7 @@ import Loading from './components/Loading';
 
 const MyComponent: React.FC = () => {
 
-  const {loading,setLoading, statusValidation, eventStatus} = useGlobalContext();
-
-
-  const [code, setCode] = useState<string | null>(null);
+  const {loading,setLoading, statusValidation, eventStatus,setEventStatus} = useGlobalContext();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -34,28 +31,34 @@ const MyComponent: React.FC = () => {
               body: JSON.stringify({
                 userid: "123"
               })
-            })
-            .then((res) => res.json())
-            .then((data) => {
-              setCode(data.code);
-              return data;
             });
-                      
+               
 
-              if(code!=null){
-    
-                console.log(data.code)
+              const startData = data;
+            //  console.log(status)
+              const body =await startData.json();
+            
+              if(startData.status ===200){
+                  
+                if(!body.code){ 
+                  
+                  setEventStatus("ERROR");
+                  
+                }
                  setLoading(false);// Hide the logo after loading
+
             break;
             }
             else{
+              console.log("error")
+              setEventStatus("ERROR");
               setLoading(false);
               break;
             }
           
           
           
-            case "SUCCESS":
+          case "SUCCESS":
               
 
                 await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -63,11 +66,19 @@ const MyComponent: React.FC = () => {
                 setLoading(false);
                 break;
             
-                case  "STEP_REQUIRED_DOC":
+          case  "STEP_REQUIRED_DOC":
                   await new Promise((resolve) => setTimeout(resolve, 1000));
 
                    setLoading(false);
                    break;
+
+          case  "ERROR":
+                    await new Promise((resolve) => setTimeout(resolve, 1000));
+  
+                     setLoading(false);
+                     break;   
+
+
 
 
               
@@ -122,6 +133,21 @@ const MyComponent: React.FC = () => {
       )}
     </>
   )
+
+
+  if(eventStatus==="ERROR") return (
+    <>
+
+    {loading ? (
+          <Loading status={statusValidation}/>
+          ) : (
+            <div className="flex items-center justify-center h-screen bg-text">  
+                something is wrong, try again
+          </div>
+      )}
+
+    </>
+  );
 
 
 
