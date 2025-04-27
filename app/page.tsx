@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 
 "use client"
-import React, {useEffect } from 'react';
+import React, {useEffect, useState } from 'react';
 import { FaceProvider } from './context/FaceContext';
 import FaceCamera from './components/FaceCamera';
 import { useGlobalContext } from './context/GlobalContext';
@@ -16,16 +16,67 @@ const MyComponent: React.FC = () => {
   const {loading,setLoading, statusValidation, eventStatus} = useGlobalContext();
 
 
+  const [code, setCode] = useState<string | null>(null);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         //here add the fetch valid api
-        await new Promise((resolve) => setTimeout(resolve, 2000));
+        //await new Promise((resolve) => setTimeout(resolve, 2000));
 
-        setLoading(false);// Hide the logo after loading
-        //setEventStatus("END_KYC");
-         return true;
+        switch(eventStatus){
+          case "START_KYC":
+            const data = await fetch("http://localhost:3001/start", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                userid: "123"
+              })
+            })
+            .then((res) => res.json())
+            .then((data) => {
+              setCode(data.code);
+              return data;
+            });
+                      
+
+              if(code!=null){
+    
+                console.log(data.code)
+                 setLoading(false);// Hide the logo after loading
+            break;
+            }
+            else{
+              setLoading(false);
+              break;
+            }
+          
+          
+          
+            case "SUCCESS":
+              
+
+                await new Promise((resolve) => setTimeout(resolve, 1000));
+
+                setLoading(false);
+                break;
+            
+                case  "STEP_REQUIRED_DOC":
+                  await new Promise((resolve) => setTimeout(resolve, 1000));
+
+                   setLoading(false);
+                   break;
+
+
+              
+            
+          
+
+        }
       } catch {
+
         setLoading(true);
       }
     };
@@ -46,7 +97,7 @@ const MyComponent: React.FC = () => {
       </>
   );
 
-  if(eventStatus==="STEP_REQUIRED_FRONT_DOC") return (
+  if(eventStatus==="STEP_REQUIRED_DOC") return (
     <>
     
        {loading ? (
@@ -57,6 +108,19 @@ const MyComponent: React.FC = () => {
           </div>
       )}
       </>
+  );
+
+  if(eventStatus==="SUCCESS") return (
+    <>
+    
+    {loading ? (
+          <Loading status={statusValidation}/>
+          ) : (
+            <div className="flex items-center justify-center h-screen bg-text">  
+                all ok, end kyc
+          </div>
+      )}
+    </>
   )
 
 
