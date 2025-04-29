@@ -21,46 +21,44 @@ export const useDocsContext = () => {
 };
 
 export const DocsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const videoDocRef = useRef<HTMLVideoElement | null>(null);
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  //const intervalRef = useRef<NodeJS.Timeout | null>(null);
+          const videoDocRef = useRef<HTMLVideoElement | null>(null);
+          const canvasRef = useRef<HTMLCanvasElement | null>(null);
+          //const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const [textStatus, setTextStatus] = useState<string>("Posicione seu rosto dentro da marcação");
-  const [cameraError, setCameraError] = useState<boolean>(false);
+          const [textStatus, setTextStatus] = useState<string>("Posicione seu rosto dentro da marcação");
+          const [cameraError, setCameraError] = useState<boolean>(false);
 
-  const [dataValidValidation, setDataValidValidation] = useState<boolean>(false);
+          const [dataValidValidation, setDataValidValidation] = useState<boolean>(false);
 
-  const [facingMode, setFacingMode] = useState<"user" | "environment">("user");
-
-
-  useEffect(() => {
-    const loadModels = async () => {
-      const MODEL_URL = "/models";
-      await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
-      startVideo();
-    };
-
-    const startVideo = () => {
-      if (!navigator.mediaDevices?.getUserMedia) {
-        setCameraError(true);
-        return;
-      }
+          const [facingMode, setFacingMode] = useState<"user" | "environment">("user");
 
 
-      console.log("start camera docs context")
+          useEffect(() => {
+              const loadModels = async () => {
+              const MODEL_URL = "/models";
+              await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
+              startVideo();
+            };
 
-        navigator.mediaDevices
-    .getUserMedia({ video: { facingMode }, audio: false })
-    .then((stream) => {
-      if (videoDocRef.current) {
-        videoDocRef.current.srcObject = stream;
-      }
-    })
-    .catch(() => setCameraError(true));
-    };
+            const startVideo = () => {
+              if (!navigator.mediaDevices?.getUserMedia) {
+                setCameraError(true);
+                return;
+              };
+
+            console.log("start camera docs context");
+
+            navigator.mediaDevices
+            .getUserMedia({ video: { facingMode }, audio: false })
+            .then((stream) => {
+              if (videoDocRef.current) {
+                videoDocRef.current.srcObject = stream;
+              }
+            }).catch(() => setCameraError(true));
+            };
 
 
-    loadModels();
+            loadModels();
   }, [facingMode]);
 
   const captureAndSendImage = () => {
@@ -71,9 +69,9 @@ export const DocsProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const video = videoDocRef.current;
   
 
-    canvas.width = 1024;
-      canvas.height = 768;
-    
+      canvas.width = 1024;
+      canvas.height = 768;    
+
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
     
@@ -93,28 +91,28 @@ export const DocsProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // Mais alto que largo: corta no topo/baixo
         sHeight = videoWidth;
         sy = (videoHeight - sHeight) / 2;
-      }
-    
+            }
       ctx.drawImage(video, sx, sy, sWidth, sHeight, 0, 0, 1024, 768);
     
       const imageData = canvas.toDataURL();
 
-      console.log(imageData);
-    setTextStatus("Imagem capturada e enviada para API (simulado)");
-    setDataValidValidation(true);
-    videoDocRef.current=null;
-    canvasRef.current=null;
-    return;
+          console.log(imageData);
+          setTextStatus("Imagem capturada e enviada para API (simulado)");
+          setDataValidValidation(true);
+          videoDocRef.current=null;
+          canvasRef.current=null;
+                              
+        return;
 
   };
 
   const toggleFacingMode = () => {
     // Desliga o stream atual
-    const stream = videoDocRef.current?.srcObject as MediaStream;
-    stream?.getTracks().forEach(track => track.stop());
+        const stream = videoDocRef.current?.srcObject as MediaStream;
+        stream?.getTracks().forEach(track => track.stop());
 
-    setFacingMode((prev) => (prev === "user" ? "environment" : "user"));
-    console.log(facingMode);
+        setFacingMode((prev) => (prev === "user" ? "environment" : "user"));
+        console.log(facingMode);
   };
 
   

@@ -78,17 +78,10 @@ const MyComponent: React.FC = () => {
                      setLoading(false);
                      break;   
 
-
-
-
-              
-            
-          
-
         }
       } catch {
-
-        setLoading(true);
+        setEventStatus("ERROR")
+        setLoading(false);
       }
     };
 
