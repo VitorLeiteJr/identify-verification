@@ -74,6 +74,11 @@ export const FaceProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     setFaceTooSmall(true);
                     return;
                 }
+                if (width > 320 || height > 320) {
+                  setTextStatus("Afaste um pouco da camera")
+                  setFaceTooSmall(true);
+                  return;
+                }
                 
 
         setFaceTooSmall(false);
