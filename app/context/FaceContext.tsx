@@ -74,12 +74,7 @@ export const FaceProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     setFaceTooSmall(true);
                     return;
                 }
-
-
-
-
-               
-
+                
 
         setFaceTooSmall(false);
         faceCapturedRef.current = true;
@@ -140,12 +135,13 @@ export const FaceProvider: React.FC<{ children: React.ReactNode }> = ({ children
           userid: "123"
         })
       });
-                        
-        if(data.status===200){
 
-        const response = await data.json();
+      const dataStart = data;
+      const body = await dataStart.json();
+                        
+        if(dataStart.status===200){
           
-        console.log("face:" +response)
+          console.log(body);
         
 
       setEventStatus("SUCCESS");
